@@ -153,5 +153,5 @@ workflows:
     jobs:
       - install-dependencies
       - e2e-test:
-        requires:
-          - install-dependencies
+          requires:
+            - install-dependencies
