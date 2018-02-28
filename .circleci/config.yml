@@ -61,22 +61,6 @@ jobs:
       - store_artifacts:
           path: test-reports
 
-  install-e2e-dependencies:
-    working_directory: ~/repo
-    docker:
-      - image: karrot/e2e:1.1
-    steps:
-      - attach_workspace:
-          at: ~/repo
-
-
-
-      - persist_to_workspace:
-          root: ~/repo
-          paths:
-            - karrot-backend
-            - env
-
   e2e-test:
     working_directory: ~/repo
     docker:
@@ -102,6 +86,7 @@ jobs:
             LANG: C.UTF-8
           command: |
             set -x
+            apt-get install wget
             test -d env/bin || virtualenv -p python3 env
             source env/bin/activate
             git clone https://github.com/yunity/karrot-backend
