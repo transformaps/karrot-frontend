@@ -1,4 +1,4 @@
-import { storybookDefaults as defaults } from '>/helpers'
+import { storybookDefaults as defaults, statusMocks } from '>/helpers'
 import { storiesOf } from '@storybook/vue'
 import { historyMock } from '>/mockdata'
 
@@ -9,8 +9,8 @@ storiesOf('History List', module)
     render: h => h(HistoryListUI, {
       props: {
         history: historyMock,
-        status: { pending: false, hasValidationErrors: false },
-        canLoadMore: true,
+        status: statusMocks.default(),
+        canLoadMore: false,
         fetchMore: () => {},
       },
     }),

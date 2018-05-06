@@ -1,7 +1,15 @@
 <template>
   <div class="wrapper">
+    <span v-if="!user">
+      <span>?</span>
+      <q-tooltip>
+        <span>
+          {{ $t('PROFILE.INACCESSIBLE_OR_DELETED') }}
+        </span>
+      </q-tooltip>
+    </span>
     <router-link
-      v-if="isLink && user"
+      v-else-if="isLink"
       :to="{name:'user', params: {userId: user.id}}"
     >
       <img
@@ -20,7 +28,7 @@
         {{ user.displayName }}
       </q-tooltip>
     </router-link>
-    <div v-if="!isLink && user">
+    <div v-else>
       <img
         v-if="hasPhoto"
         :src="photo"
@@ -34,14 +42,6 @@
         :style="pictureStyle"
       />
     </div>
-    <span v-if="!user">
-      <span>?</span>
-      <q-tooltip>
-        <span>
-          {{ $t('PROFILE.INACCESSIBLE_OR_DELETED') }}
-        </span>
-      </q-tooltip>
-    </span>
   </div>
 </template>
 
