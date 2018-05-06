@@ -24,8 +24,9 @@ ios-defaults: &ios-defaults
   working_directory: ~/repo
   macos:
     xcode: "9.2.0"
+  shell: /bin/bash --login -eo pipefail
 
-build-ios: &build-ios
+prepare-build-ios: &prepare-build-ios
   command: |
     rm -f cordova/www
     mv dist-app-${CORDOVA_ENV} cordova/www
@@ -54,6 +55,20 @@ jobs:
           root: ~/repo
           paths:
             - .
+
+  install-fastlane-dependencies:
+    <<: *ios-defaults
+    steps:
+      - checkout
+      - attach_workspace:
+          at: ~/repo/
+      - restore_cache:
+          key: 1-fastlane-dependencies-{{ checksum "cordova/Gemfile.lock" }}
+      - run: bundle check || bundle install --path vendor/cordova
+      - save_cache:
+          paths:
+            - vendor/cordova
+          key: 1-fastlane-dependencies-{{ checksum "cordova/Gemfile.lock" }}
 
   test:
     <<: *defaults
@@ -303,9 +318,17 @@ jobs:
           at: .
       - run: yarn global add cordova
       - run:
-          <<: *build-ios
+          <<: *prepare-build-ios
           environment:
             CORDOVA_ENV: dev
+      - run:
+          command: |
+            export LC_ALL=C.UTF-8
+            export LANG=C.UTF-8
+            fastlane test
+          environment:
+            GYM_WORKSPACE: platforms/ios/Karrot Dev.xcworkspace
+            APPLE_ID: IOS_APPLE_ID
 
   deploy-dev:
     <<: *defaults
@@ -384,6 +407,7 @@ workflows:
       - build-ios-dev:
           requires:
             - build-cordova-dev
+            - install-fastlane-dependencies
       - deploy-android-dev:
           filters:
             branches:
